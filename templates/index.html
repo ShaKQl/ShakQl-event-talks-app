@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BigQuery Release Hub</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(20, 28, 48, 0.6);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            --accent-gcloud: #4285f4;
+            
+            /* Type-specific colors */
+            --color-feature: #10b981;
+            --color-feature-bg: rgba(16, 185, 129, 0.15);
+            --color-changed: #06b6d4;
+            --color-changed-bg: rgba(6, 182, 212, 0.15);
+            --color-deprecated: #f59e0b;
+            --color-deprecated-bg: rgba(245, 158, 11, 0.15);
+            --color-fixed: #8b5cf6;
+            --color-fixed-bg: rgba(139, 92, 246, 0.15);
+            --color-other: #6b7280;
+            --color-other-bg: rgba(107, 114, 128, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        header {
+            border-bottom: 1px solid var(--card-border);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            background: rgba(11, 15, 25, 0.8);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            font-size: 1.75rem;
+            background: linear-gradient(135deg, #4285f4, #34a853, #fbbc05, #ea4335);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #ffffff, #9ca3af);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .actions-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .refresh-btn {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+            padding: 0.6rem 1.2rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .refresh-btn:hover {
+            background: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .refresh-btn:active {
+            transform: scale(0.95);
+        }
+
+        .refresh-btn i.fa-spin {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sidebar / Controls */
+        .controls-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            height: fit-content;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            position: sticky;
+            top: 6rem;
+        }
+
+        .control-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .control-group h3 {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--card-border);
+            color: white;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.875rem;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 0.875rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .filter-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-secondary);
+            padding: 0.6rem 0.875rem;
+            border-radius: 8px;
+            text-align: left;
+            font-family: inherit;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-primary);
+        }
+
+        .filter-btn.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: #60a5fa;
+            border-color: rgba(59, 130, 246, 0.2);
+            font-weight: 600;
+        }
+
+        .filter-count {
+            font-size: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.1rem 0.5rem;
+            border-radius: 9999px;
+            color: var(--text-secondary);
+        }
+
+        .filter-btn.active .filter-count {
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+        }
+
+        /* Timeline & Content Area */
+        .content-area {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .status-message {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 3rem;
+            text-align: center;
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .status-message i {
+            font-size: 3rem;
+            color: var(--accent-blue);
+        }
+
+        .status-message.error i {
+            color: #ef4444;
+        }
+
+        .loader-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(59, 130, 246, 0.1);
+            border-top: 4px solid var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Daily Group Timeline */
+        .timeline-group {
+            position: relative;
+            padding-left: 2rem;
+            border-left: 2px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .timeline-date-marker {
+            position: absolute;
+            left: -0.55rem;
+            top: 0;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+            background: var(--bg-color);
+            border: 3px solid var(--accent-blue);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+            z-index: 1;
+        }
+
+        .timeline-date-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .timeline-date-title span.relative-time {
+            font-size: 0.85rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.2rem 0.6rem;
+            border-radius: 9999px;
+        }
+
+        .cards-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Update Card */
+        .update-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .update-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--type-color, var(--color-other));
+        }
+
+        .update-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .type-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            background: var(--type-bg-color, var(--color-other-bg));
+            color: var(--type-color, var(--color-other));
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .card-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .card-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        .card-btn.tweet-btn:hover {
+            background: rgba(29, 155, 240, 0.15);
+            color: #1d9bf0;
+            border-color: rgba(29, 155, 240, 0.3);
+        }
+
+        /* Card Content Styling */
+        .card-body {
+            font-size: 0.925rem;
+            line-height: 1.6;
+            color: #d1d5db;
+        }
+
+        .card-body p {
+            margin-bottom: 0.75rem;
+        }
+
+        .card-body p:last-child {
+            margin-bottom: 0;
+        }
+
+        .card-body a {
+            color: #60a5fa;
+            text-decoration: none;
+            border-bottom: 1px dashed rgba(96, 165, 250, 0.4);
+            transition: all 0.2s;
+        }
+
+        .card-body a:hover {
+            color: #93c5fd;
+            border-bottom-style: solid;
+        }
+
+        .card-body ul, .card-body ol {
+            margin-left: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-body li {
+            margin-bottom: 0.25rem;
+        }
+
+        .card-body code {
+            font-family: 'Courier New', Courier, monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.1rem 0.3rem;
+            border-radius: 4px;
+            color: #f472b6;
+            font-size: 0.85em;
+        }
+
+        /* Tweet Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(7, 10, 18, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-container {
+            background: #151f32;
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            width: 100%;
+            max-width: 520px;
+            padding: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .modal-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modal-title i {
+            color: #1d9bf0;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: white;
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .tweet-composer {
+            position: relative;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 0.75rem;
+        }
+
+        .tweet-composer textarea {
+            width: 100%;
+            height: 140px;
+            background: transparent;
+            border: none;
+            color: white;
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: none;
+            outline: none;
+            line-height: 1.5;
+        }
+
+        .tweet-counter-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .character-count {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .char-number {
+            font-weight: 600;
+        }
+
+        .char-number.warning {
+            color: #f59e0b;
+        }
+
+        .char-number.danger {
+            color: #ef4444;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.10);
+        }
+
+        .btn-primary {
+            background: #1d9bf0;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: #1a8cd8;
+        }
+
+        .btn-primary:disabled {
+            background: #4b5563;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(20, 28, 48, 0.95);
+            border: 1px solid var(--card-border);
+            border-left: 4px solid var(--accent-blue);
+            color: white;
+            padding: 0.875rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 2000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .toast.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .toast.success {
+            border-left-color: var(--color-feature);
+        }
+
+        /* Empty/Search States */
+        .no-results {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            color: var(--text-secondary);
+        }
+
+        .no-results i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="logo-section">
+                <i class="fa-solid fa-database logo-icon"></i>
+                <div class="logo-text">
+                    <h1>BigQuery Release Hub</h1>
+                    <p>Track updates, explore enhancements, and share release details</p>
+                </div>
+            </div>
+            <div class="actions-section">
+                <button class="refresh-btn" id="refreshBtn" onclick="fetchReleaseNotes()">
+                    <i class="fa-solid fa-rotate-right" id="refreshIcon"></i>
+                    <span>Refresh</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Sidebar -->
+        <aside class="controls-panel">
+            <div class="control-group">
+                <h3>Search</h3>
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" placeholder="Filter release notes..." oninput="handleFilterAndSearch()">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>Category Filter</h3>
+                <div class="filter-options">
+                    <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">
+                        <span>All Updates</span>
+                        <span class="filter-count" id="count-all">0</span>
+                    </button>
+                    <button class="filter-btn" data-filter="feature" onclick="setFilter('feature')">
+                        <span><i class="fa-solid fa-circle" style="color: var(--color-feature); font-size: 0.5rem; margin-right: 0.5rem;"></i>Features</span>
+                        <span class="filter-count" id="count-feature">0</span>
+                    </button>
+                    <button class="filter-btn" data-filter="changed" onclick="setFilter('changed')">
+                        <span><i class="fa-solid fa-circle" style="color: var(--color-changed); font-size: 0.5rem; margin-right: 0.5rem;"></i>Changes</span>
+                        <span class="filter-count" id="count-changed">0</span>
+                    </button>
+                    <button class="filter-btn" data-filter="deprecated" onclick="setFilter('deprecated')">
+                        <span><i class="fa-solid fa-circle" style="color: var(--color-deprecated); font-size: 0.5rem; margin-right: 0.5rem;"></i>Deprecations</span>
+                        <span class="filter-count" id="count-deprecated">0</span>
+                    </button>
+                    <button class="filter-btn" data-filter="fixed" onclick="setFilter('fixed')">
+                        <span><i class="fa-solid fa-circle" style="color: var(--color-fixed); font-size: 0.5rem; margin-right: 0.5rem;"></i>Fixes</span>
+                        <span class="filter-count" id="count-fixed">0</span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Feed Content Area -->
+        <section class="content-area" id="contentArea">
+            <div class="status-message">
+                <div class="loader-spinner"></div>
+                <p>Loading BigQuery Release Notes...</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Tweet Composer Modal -->
+    <div class="modal-overlay" id="tweetModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fa-brands fa-x-twitter"></i>
+                    <span>Share on X / Twitter</span>
+                </div>
+                <button class="modal-close" onclick="closeTweetModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="tweet-composer">
+                    <textarea id="tweetTextarea" oninput="updateCharCount()" maxlength="1000"></textarea>
+                </div>
+                <div class="tweet-counter-section">
+                    <span>Drafting your update</span>
+                    <div class="character-count">
+                        <span id="charCountDisplay" class="char-number">0</span>
+                        <span>/ 280</span>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-secondary" onclick="copyTweetText()">
+                        <i class="fa-solid fa-copy"></i> Copy Text
+                    </button>
+                    <button class="btn-primary" id="submitTweetBtn" onclick="launchTwitterIntent()">
+                        <i class="fa-brands fa-x-twitter"></i> Post
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Banner -->
+    <div class="toast" id="toastNotification">
+        <i class="fa-solid fa-circle-check" style="color: var(--color-feature);"></i>
+        <span id="toastMessage">Text copied to clipboard!</span>
+    </div>
+
+    <script>
+        let allEntries = [];
+        let currentFilter = 'all';
+
+        // Fetch release notes on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchReleaseNotes();
+        });
+
+        async function fetchReleaseNotes() {
+            const refreshIcon = document.getElementById('refreshIcon');
+            const refreshBtn = document.getElementById('refreshBtn');
+            const contentArea = document.getElementById('contentArea');
+
+            // Start spinning icon & disabled button
+            refreshIcon.classList.add('fa-spin');
+            refreshBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/release-notes');
+                const data = await response.json();
+
+                if (data.success) {
+                    allEntries = processEntries(data.entries);
+                    updateCounters();
+                    renderTimeline();
+                } else {
+                    renderError(data.error);
+                }
+            } catch (err) {
+                renderError(err.message);
+            } finally {
+                // Stop spinning & enable button
+                refreshIcon.classList.remove('fa-spin');
+                refreshBtn.disabled = false;
+            }
+        }
+
+        // Parse standard Atom entries and break down multiple h3 changes into individual items
+        function processEntries(entries) {
+            const processed = [];
+            const tempDiv = document.createElement('div');
+
+            entries.forEach(entry => {
+                tempDiv.innerHTML = entry.content;
+                const children = Array.from(tempDiv.children);
+
+                let currentUpdate = null;
+                const items = [];
+
+                children.forEach(child => {
+                    if (child.tagName === 'H3') {
+                        if (currentUpdate) {
+                            items.push(currentUpdate);
+                        }
+                        const typeText = child.textContent.trim();
+                        currentUpdate = {
+                            type: typeText,
+                            contentHtml: '',
+                            rawText: ''
+                        };
+                    } else if (currentUpdate) {
+                        currentUpdate.contentHtml += child.outerHTML;
+                        currentUpdate.rawText += child.textContent + ' ';
+                    }
+                });
+
+                if (currentUpdate) {
+                    items.push(currentUpdate);
+                }
+
+                // If feed has no H3 markup (fallback), treat whole block as generic update
+                if (items.length === 0) {
+                    items.push({
+                        type: 'Update',
+                        contentHtml: entry.content,
+                        rawText: tempDiv.textContent
+                    });
+                }
+
+                processed.push({
+                    id: entry.id,
+                    title: entry.title, // Usually date like "June 23, 2026"
+                    updated: entry.updated,
+                    link: entry.link,
+                    items: items
+                });
+            });
+
+            return processed;
+        }
+
+        function updateCounters() {
+            const counts = { all: 0, feature: 0, changed: 0, deprecated: 0, fixed: 0 };
+            
+            allEntries.forEach(entry => {
+                entry.items.forEach(item => {
+                    counts.all++;
+                    const type = item.type.toLowerCase();
+                    if (type.includes('feature')) counts.feature++;
+                    else if (type.includes('change')) counts.changed++;
+                    else if (type.includes('deprecat')) counts.deprecated++;
+                    else if (type.includes('fix') || type.includes('security')) counts.fixed++;
+                });
+            });
+
+            document.getElementById('count-all').textContent = counts.all;
+            document.getElementById('count-feature').textContent = counts.feature;
+            document.getElementById('count-changed').textContent = counts.changed;
+            document.getElementById('count-deprecated').textContent = counts.deprecated;
+            document.getElementById('count-fixed').textContent = counts.fixed;
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.dataset.filter === filter) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            renderTimeline();
+        }
+
+        function handleFilterAndSearch() {
+            renderTimeline();
+        }
+
+        function getCardConfig(type) {
+            const lowerType = type.toLowerCase();
+            if (lowerType.includes('feature')) {
+                return {
+                    color: 'var(--color-feature)',
+                    bgColor: 'var(--color-feature-bg)',
+                    icon: 'fa-solid fa-circle-plus'
+                };
+            } else if (lowerType.includes('change')) {
+                return {
+                    color: 'var(--color-changed)',
+                    bgColor: 'var(--color-changed-bg)',
+                    icon: 'fa-solid fa-pen-to-square'
+                };
+            } else if (lowerType.includes('deprecat')) {
+                return {
+                    color: 'var(--color-deprecated)',
+                    bgColor: 'var(--color-deprecated-bg)',
+                    icon: 'fa-solid fa-triangle-exclamation'
+                };
+            } else if (lowerType.includes('fix') || lowerType.includes('security')) {
+                return {
+                    color: 'var(--color-fixed)',
+                    bgColor: 'var(--color-fixed-bg)',
+                    icon: 'fa-solid fa-circle-check'
+                };
+            } else {
+                return {
+                    color: 'var(--color-other)',
+                    bgColor: 'var(--color-other-bg)',
+                    icon: 'fa-solid fa-circle-info'
+                };
+            }
+        }
+
+        function renderTimeline() {
+            const contentArea = document.getElementById('contentArea');
+            const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+
+            if (allEntries.length === 0) {
+                contentArea.innerHTML = `
+                    <div class="status-message">
+                        <i class="fa-solid fa-circle-question"></i>
+                        <p>No release notes loaded.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            let totalRendered = 0;
+
+            allEntries.forEach(entry => {
+                // Filter items inside the entry
+                const filteredItems = entry.items.filter(item => {
+                    // 1. Filter by category
+                    const type = item.type.toLowerCase();
+                    let categoryMatch = false;
+                    if (currentFilter === 'all') categoryMatch = true;
+                    else if (currentFilter === 'feature' && type.includes('feature')) categoryMatch = true;
+                    else if (currentFilter === 'changed' && type.includes('change')) categoryMatch = true;
+                    else if (currentFilter === 'deprecated' && type.includes('deprecat')) categoryMatch = true;
+                    else if (currentFilter === 'fixed' && (type.includes('fix') || type.includes('security'))) categoryMatch = true;
+
+                    if (!categoryMatch) return false;
+
+                    // 2. Search match
+                    if (searchVal) {
+                        const contentMatch = item.rawText.toLowerCase().includes(searchVal);
+                        const typeMatch = item.type.toLowerCase().includes(searchVal);
+                        const dateMatch = entry.title.toLowerCase().includes(searchVal);
+                        return contentMatch || typeMatch || dateMatch;
+                    }
+
+                    return true;
+                });
+
+                if (filteredItems.length > 0) {
+                    totalRendered += filteredItems.length;
+
+                    // Parse date for clean representation
+                    const dateStr = entry.title;
+                    
+                    html += `
+                        <div class="timeline-group">
+                            <div class="timeline-date-marker"></div>
+                            <div class="timeline-date-title">
+                                ${dateStr}
+                            </div>
+                            <div class="cards-list">
+                    `;
+
+                    filteredItems.forEach(item => {
+                        const cardConfig = getCardConfig(item.type);
+                        
+                        // Prepare tweet description block
+                        const cleanDesc = item.rawText.replace(/\s+/g, ' ').trim();
+                        
+                        html += `
+                            <div class="update-card" style="--type-color: ${cardConfig.color}; --type-bg-color: ${cardConfig.bgColor};">
+                                <div class="card-header">
+                                    <div class="type-badge">
+                                        <i class="${cardConfig.icon}"></i>
+                                        <span>${item.type}</span>
+                                    </div>
+                                    <div class="card-actions">
+                                        <button class="card-btn" onclick="copyToClipboard('${escapeHtml(cleanDesc)}')" title="Copy content text">
+                                            <i class="fa-solid fa-copy"></i>
+                                        </button>
+                                        <button class="card-btn tweet-btn" onclick="openTweetComposer('${escapeHtml(entry.title)}', '${escapeHtml(item.type)}', '${escapeHtml(cleanDesc)}', '${escapeHtml(entry.link)}')" title="Tweet this update">
+                                            <i class="fa-brands fa-x-twitter"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    ${item.contentHtml}
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            if (totalRendered === 0) {
+                contentArea.innerHTML = `
+                    <div class="no-results">
+                        <i class="fa-solid fa-magnifying-glass-minus"></i>
+                        <p>No release updates matching your query or filters were found.</p>
+                    </div>
+                `;
+            } else {
+                contentArea.innerHTML = html;
+            }
+        }
+
+        function renderError(message) {
+            const contentArea = document.getElementById('contentArea');
+            contentArea.innerHTML = `
+                <div class="status-message error">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <p>Failed to load release notes</p>
+                    <span style="font-size: 0.85rem; color: var(--text-secondary);">${message}</span>
+                </div>
+            `;
+        }
+
+        // Helper to escape HTML attributes safely
+        function escapeHtml(text) {
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Copy plain text to clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast("Copied to clipboard!");
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toastNotification');
+            const toastMsg = document.getElementById('toastMessage');
+            toastMsg.textContent = message;
+            toast.classList.add('active');
+            setTimeout(() => {
+                toast.classList.remove('active');
+            }, 3000);
+        }
+
+        /* Tweet Composer Logics */
+        let activeTweetText = "";
+
+        function openTweetComposer(date, type, rawText, link) {
+            const modal = document.getElementById('tweetModal');
+            const textarea = document.getElementById('tweetTextarea');
+            
+            // Format standard template
+            // e.g. "Google Cloud BigQuery Update [June 23, 2026] - Feature: You can now configure..."
+            let header = `BigQuery ${type} (${date}): `;
+            let hashtags = `\n\n#BigQuery #GoogleCloud`;
+            
+            // Limit rawText to fit in remaining character space
+            const maxTextLength = 280 - header.length - link.length - hashtags.length - 10; // safety margin
+            let textSnippet = rawText;
+            if (textSnippet.length > maxTextLength) {
+                textSnippet = textSnippet.substring(0, maxTextLength - 3) + "...";
+            }
+            
+            activeTweetText = `${header}${textSnippet}\n${link}${hashtags}`;
+            textarea.value = activeTweetText;
+            
+            updateCharCount();
+            modal.classList.add('active');
+        }
+
+        function closeTweetModal() {
+            const modal = document.getElementById('tweetModal');
+            modal.classList.remove('active');
+        }
+
+        function updateCharCount() {
+            const textarea = document.getElementById('tweetTextarea');
+            const countDisplay = document.getElementById('charCountDisplay');
+            const submitBtn = document.getElementById('submitTweetBtn');
+            const len = textarea.value.length;
+            
+            countDisplay.textContent = len;
+            
+            // Color code indicator
+            countDisplay.className = 'char-number';
+            if (len > 280) {
+                countDisplay.classList.add('danger');
+                submitBtn.disabled = true;
+            } else if (len > 250) {
+                countDisplay.classList.add('warning');
+                submitBtn.disabled = false;
+            } else {
+                submitBtn.disabled = false;
+            }
+        }
+
+        function copyTweetText() {
+            const text = document.getElementById('tweetTextarea').value;
+            copyToClipboard(text);
+        }
+
+        function launchTwitterIntent() {
+            const text = document.getElementById('tweetTextarea').value;
+            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+            window.open(twitterUrl, '_blank', 'width=550,height=420');
+            closeTweetModal();
+        }
+    </script>
+</body>
+</html>
