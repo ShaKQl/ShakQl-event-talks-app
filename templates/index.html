@@ -22,6 +22,7 @@
             --accent-blue-hover: #2563eb;
             --accent-gcloud: #4285f4;
             --panel-shadow: rgba(0, 0, 0, 0.3);
+            --skeleton-color: rgba(255, 255, 255, 0.04);
             
             /* Type-specific colors */
             --color-feature: #10b981;
@@ -45,6 +46,7 @@
             --accent-blue: #2563eb;
             --accent-blue-hover: #1d4ed8;
             --panel-shadow: rgba(0, 0, 0, 0.05);
+            --skeleton-color: rgba(0, 0, 0, 0.05);
             
             /* Type-specific colors for light mode (darker text for contrast) */
             --color-feature: #047857;
@@ -140,6 +142,19 @@
             display: flex;
             align-items: center;
             gap: 1.25rem;
+        }
+
+        /* Keyboard Shortcut Hint */
+        .shortcut-badge {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-family: monospace;
+            border: 1px solid var(--card-border);
+            margin-left: 0.5rem;
+            vertical-align: middle;
         }
 
         /* Modern Switch Styling */
@@ -308,7 +323,7 @@
             background: rgba(15, 23, 42, 0.4);
             border: 1px solid var(--card-border);
             color: var(--text-primary);
-            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            padding: 0.75rem 1.5rem 0.75rem 2.25rem;
             border-radius: 10px;
             font-family: inherit;
             font-size: 0.875rem;
@@ -451,13 +466,99 @@
             color: #ef4444;
         }
 
-        .loader-spinner {
-            width: 48px;
-            height: 48px;
-            border: 4px solid rgba(59, 130, 246, 0.1);
-            border-top: 4px solid var(--accent-blue);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        /* Dynamic Search Highlighting */
+        mark.highlight {
+            background: rgba(251, 191, 36, 0.3);
+            color: inherit;
+            padding: 0.1rem 0.2rem;
+            border-radius: 4px;
+        }
+
+        /* Skeleton Loaders */
+        .skeleton-group {
+            position: relative;
+            padding-left: 2rem;
+            border-left: 2px solid var(--card-border);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .skeleton-date {
+            width: 140px;
+            height: 24px;
+            background: var(--skeleton-color);
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skeleton-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            height: 130px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 1.25rem;
+            gap: 1rem;
+        }
+
+        .skeleton-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .skeleton-badge {
+            width: 80px;
+            height: 20px;
+            background: var(--skeleton-color);
+            border-radius: 6px;
+        }
+
+        .skeleton-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .skeleton-btn {
+            width: 60px;
+            height: 28px;
+            background: var(--skeleton-color);
+            border-radius: 6px;
+        }
+
+        .skeleton-line {
+            height: 14px;
+            background: var(--skeleton-color);
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        .skeleton-line.short {
+            width: 60%;
+        }
+
+        .skeleton-date::after, .skeleton-card::after, .skeleton-badge::after, .skeleton-btn::after, .skeleton-line::after {
+            content: "";
+            position: absolute;
+            top: 0; right: 0; bottom: 0; left: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+            animation: loading-shimmer 1.5s infinite;
+        }
+
+        body.light-mode .skeleton-date::after, body.light-mode .skeleton-card::after, body.light-mode .skeleton-badge::after, body.light-mode .skeleton-btn::after, body.light-mode .skeleton-line::after {
+            background: linear-gradient(90deg, transparent, rgba(0,0,0,0.04), transparent);
+        }
+
+        @keyframes loading-shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         /* Daily Group Timeline */
@@ -573,7 +674,7 @@
             font-size: 0.8rem;
             font-weight: 600;
             font-family: inherit;
-            transition: all 0.2s;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         body.light-mode .card-btn {
@@ -880,6 +981,7 @@
             border: 1px solid var(--card-border);
             border-radius: 16px;
             color: var(--text-secondary);
+            box-shadow: 0 4px 20px var(--panel-shadow);
         }
 
         .no-results i {
@@ -923,7 +1025,7 @@
         <!-- Sidebar -->
         <aside class="controls-panel">
             <div class="control-group">
-                <h3>Search</h3>
+                <h3>Search <span class="shortcut-badge">/</span></h3>
                 <div class="search-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" id="searchInput" placeholder="Filter release notes..." oninput="handleFilterAndSearch()">
@@ -966,9 +1068,33 @@
 
         <!-- Feed Content Area -->
         <section class="content-area" id="contentArea">
-            <div class="status-message">
-                <div class="loader-spinner"></div>
-                <p>Loading BigQuery Release Notes...</p>
+            <!-- Initial Skeleton Placeholder -->
+            <div class="skeleton-timeline">
+                <div class="skeleton-group">
+                    <div class="skeleton-date"></div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-card-header">
+                            <div class="skeleton-badge"></div>
+                            <div class="skeleton-actions">
+                                <div class="skeleton-btn"></div>
+                                <div class="skeleton-btn"></div>
+                            </div>
+                        </div>
+                        <div class="skeleton-line"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-card-header">
+                            <div class="skeleton-badge"></div>
+                            <div class="skeleton-actions">
+                                <div class="skeleton-btn"></div>
+                                <div class="skeleton-btn"></div>
+                            </div>
+                        </div>
+                        <div class="skeleton-line"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
@@ -1028,6 +1154,29 @@
             fetchReleaseNotes();
         });
 
+        // Keyboard Shortcuts listener
+        document.addEventListener('keydown', (e) => {
+            // Focus search input on pressing '/'
+            if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+                document.getElementById('searchInput').focus();
+            }
+            // Escape key logic
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('tweetModal');
+                if (modal.classList.contains('active')) {
+                    closeTweetModal();
+                } else {
+                    const searchInput = document.getElementById('searchInput');
+                    if (document.activeElement === searchInput) {
+                        searchInput.value = '';
+                        searchInput.blur();
+                        handleFilterAndSearch();
+                    }
+                }
+            }
+        });
+
         // Theme toggling functionality
         function toggleTheme() {
             const isLight = document.getElementById('themeToggle').checked;
@@ -1061,6 +1210,7 @@
             // Start spinning icon & disabled button
             refreshIcon.classList.add('fa-spin');
             refreshBtn.disabled = true;
+            renderSkeleton();
 
             try {
                 const response = await fetch('/api/release-notes');
@@ -1080,6 +1230,28 @@
                 refreshIcon.classList.remove('fa-spin');
                 refreshBtn.disabled = false;
             }
+        }
+
+        // Render skeleton blocks
+        function renderSkeleton() {
+            const contentArea = document.getElementById('contentArea');
+            contentArea.innerHTML = `
+                <div class="skeleton-timeline">
+                    <div class="skeleton-group">
+                        <div class="skeleton-date"></div>
+                        <div class="skeleton-card">
+                            <div class="skeleton-card-header"><div class="skeleton-badge"></div><div class="skeleton-actions"><div class="skeleton-btn"></div><div class="skeleton-btn"></div></div></div>
+                            <div class="skeleton-line"></div>
+                            <div class="skeleton-line short"></div>
+                        </div>
+                        <div class="skeleton-card">
+                            <div class="skeleton-card-header"><div class="skeleton-badge"></div><div class="skeleton-actions"><div class="skeleton-btn"></div><div class="skeleton-btn"></div></div></div>
+                            <div class="skeleton-line"></div>
+                            <div class="skeleton-line short"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         // Parse standard Atom entries and break down multiple h3 changes into individual items
@@ -1173,6 +1345,11 @@
             renderTimeline();
         }
 
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            setFilter('all');
+        }
+
         function getCardConfig(type) {
             const lowerType = type.toLowerCase();
             if (lowerType.includes('feature')) {
@@ -1249,8 +1426,17 @@
             return filtered;
         }
 
+        // Dynamic highlight helper outside tag contents
+        function highlightMatch(htmlContent, query) {
+            if (!query) return htmlContent;
+            const escapedQuery = query.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+            const regex = new RegExp(`(${escapedQuery})(?![^<>]*>)`, 'gi');
+            return htmlContent.replace(regex, '<mark class="highlight">$1</mark>');
+        }
+
         function renderTimeline() {
             const contentArea = document.getElementById('contentArea');
+            const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
             const filtered = getFilteredItems();
 
             if (allEntries.length === 0) {
@@ -1269,11 +1455,14 @@
             filtered.forEach(group => {
                 totalRendered += group.items.length;
                 
+                // Highlight searchVal in group date if matches
+                const highlightedDate = highlightMatch(group.date, searchVal);
+
                 html += `
                     <div class="timeline-group">
                         <div class="timeline-date-marker"></div>
                         <div class="timeline-date-title">
-                            ${group.date}
+                            ${highlightedDate}
                         </div>
                         <div class="cards-list">
                 `;
@@ -1282,15 +1471,19 @@
                     const cardConfig = getCardConfig(item.type);
                     const cleanDesc = item.rawText.replace(/\s+/g, ' ').trim();
                     
+                    // Highlight query matches inside type labels and HTML block
+                    const highlightedType = highlightMatch(item.type, searchVal);
+                    const highlightedBody = highlightMatch(item.contentHtml, searchVal);
+
                     html += `
                         <div class="update-card" style="--type-color: ${cardConfig.color}; --type-bg-color: ${cardConfig.bgColor};">
                             <div class="card-header">
                                 <div class="type-badge">
                                     <i class="${cardConfig.icon}"></i>
-                                    <span>${item.type}</span>
+                                    <span>${highlightedType}</span>
                                 </div>
                                 <div class="card-actions">
-                                    <button class="card-btn" onclick="copyToClipboard('${escapeHtml(cleanDesc)}')" title="Copy release note text">
+                                    <button class="card-btn" onclick="copyToClipboard('${escapeHtml(cleanDesc)}', this)" title="Copy release note text">
                                         <i class="fa-solid fa-copy"></i> Copy Text
                                     </button>
                                     <button class="card-btn tweet-btn" onclick="openTweetComposer('${escapeHtml(group.date)}', '${escapeHtml(item.type)}', '${escapeHtml(cleanDesc)}', '${escapeHtml(group.link)}')" title="Tweet this update">
@@ -1299,7 +1492,7 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                ${item.contentHtml}
+                                ${highlightedBody}
                             </div>
                         </div>
                     `;
@@ -1316,6 +1509,9 @@
                     <div class="no-results">
                         <i class="fa-solid fa-magnifying-glass-minus"></i>
                         <p>No release updates matching your query or filters were found.</p>
+                        <button class="export-btn" style="width: auto; margin: 1rem auto 0; padding: 0.5rem 1.25rem;" onclick="resetFilters()">
+                            <i class="fa-solid fa-rotate-left"></i> Reset Search & Filters
+                        </button>
                     </div>
                 `;
             } else {
@@ -1344,10 +1540,21 @@
                 .replace(/'/g, "&#039;");
         }
 
-        // Copy plain text to clipboard
-        function copyToClipboard(text) {
+        // Copy plain text to clipboard with local UI validation
+        function copyToClipboard(text, btnElement) {
             navigator.clipboard.writeText(text).then(() => {
                 showToast("Copied to clipboard!");
+                if (btnElement) {
+                    const originalHtml = btnElement.innerHTML;
+                    btnElement.innerHTML = `<i class="fa-solid fa-check" style="color: var(--color-feature);"></i> Copied!`;
+                    btnElement.style.borderColor = 'var(--color-feature)';
+                    btnElement.disabled = true;
+                    setTimeout(() => {
+                        btnElement.innerHTML = originalHtml;
+                        btnElement.style.borderColor = '';
+                        btnElement.disabled = false;
+                    }, 1500);
+                }
             }).catch(err => {
                 console.error('Failed to copy: ', err);
             });
