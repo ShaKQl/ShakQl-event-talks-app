@@ -21,6 +21,7 @@
             --accent-blue: #3b82f6;
             --accent-blue-hover: #2563eb;
             --accent-gcloud: #4285f4;
+            --panel-shadow: rgba(0, 0, 0, 0.3);
             
             /* Type-specific colors */
             --color-feature: #10b981;
@@ -33,6 +34,29 @@
             --color-fixed-bg: rgba(139, 92, 246, 0.15);
             --color-other: #6b7280;
             --color-other-bg: rgba(107, 114, 128, 0.15);
+        }
+
+        body.light-mode {
+            --bg-color: #f3f4f6;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-border: rgba(0, 0, 0, 0.1);
+            --text-primary: #1f2937;
+            --text-secondary: #4b5563;
+            --accent-blue: #2563eb;
+            --accent-blue-hover: #1d4ed8;
+            --panel-shadow: rgba(0, 0, 0, 0.05);
+            
+            /* Type-specific colors for light mode (darker text for contrast) */
+            --color-feature: #047857;
+            --color-feature-bg: rgba(4, 120, 87, 0.1);
+            --color-changed: #0891b2;
+            --color-changed-bg: rgba(8, 145, 178, 0.1);
+            --color-deprecated: #d97706;
+            --color-deprecated-bg: rgba(217, 119, 6, 0.1);
+            --color-fixed: #6d28d9;
+            --color-fixed-bg: rgba(109, 40, 217, 0.1);
+            --color-other: #4b5563;
+            --color-other-bg: rgba(75, 85, 99, 0.1);
         }
 
         * {
@@ -51,6 +75,13 @@
                 radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
                 radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 40%);
             background-attachment: fixed;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.light-mode {
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 40%);
         }
 
         header {
@@ -61,6 +92,11 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        body.light-mode header {
+            background: rgba(243, 244, 246, 0.8);
         }
 
         .header-container {
@@ -70,6 +106,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
         .logo-section {
@@ -90,9 +128,7 @@
             font-size: 1.5rem;
             font-weight: 700;
             letter-spacing: -0.5px;
-            background: linear-gradient(to right, #ffffff, #9ca3af);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--text-primary);
         }
 
         .logo-text p {
@@ -103,7 +139,76 @@
         .actions-section {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 1.25rem;
+        }
+
+        /* Modern Switch Styling */
+        .theme-switch-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            padding: 0.4rem 0.8rem;
+            border-radius: 9999px;
+        }
+
+        body.light-mode .theme-switch-container {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .theme-switch-container i {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .theme-switch-container i.active {
+            color: var(--accent-blue);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 38px;
+            height: 20px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #4b5563;
+            transition: .3s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--accent-blue);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(18px);
         }
 
         .refresh-btn {
@@ -119,6 +224,12 @@
             align-items: center;
             gap: 0.5rem;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.light-mode .refresh-btn {
+            background: rgba(37, 99, 235, 0.08);
+            border-color: rgba(37, 99, 235, 0.2);
+            color: var(--accent-blue);
         }
 
         .refresh-btn:hover {
@@ -167,6 +278,8 @@
             -webkit-backdrop-filter: blur(8px);
             position: sticky;
             top: 6rem;
+            box-shadow: 0 4px 20px var(--panel-shadow);
+            transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
         }
 
         .control-group {
@@ -192,14 +305,18 @@
 
         .search-box input {
             width: 100%;
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(15, 23, 42, 0.4);
             border: 1px solid var(--card-border);
-            color: white;
+            color: var(--text-primary);
             padding: 0.75rem 1rem 0.75rem 2.5rem;
             border-radius: 10px;
             font-family: inherit;
             font-size: 0.875rem;
             transition: all 0.3s;
+        }
+
+        body.light-mode .search-box input {
+            background: rgba(255, 255, 255, 0.6);
         }
 
         .search-box input:focus {
@@ -241,13 +358,17 @@
         }
 
         .filter-btn:hover {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.05);
             color: var(--text-primary);
+        }
+
+        body.light-mode .filter-btn:hover {
+            background: rgba(0, 0, 0, 0.03);
         }
 
         .filter-btn.active {
             background: rgba(59, 130, 246, 0.1);
-            color: #60a5fa;
+            color: var(--accent-blue);
             border-color: rgba(59, 130, 246, 0.2);
             font-weight: 600;
         }
@@ -260,9 +381,44 @@
             color: var(--text-secondary);
         }
 
+        body.light-mode .filter-count {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
         .filter-btn.active .filter-count {
             background: rgba(59, 130, 246, 0.2);
-            color: #93c5fd;
+            color: var(--accent-blue);
+        }
+
+        /* Export Button */
+        .export-btn {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            margin-top: 0.5rem;
+        }
+
+        body.light-mode .export-btn {
+            background: #ffffff;
+        }
+
+        .export-btn:hover {
+            background: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
         }
 
         /* Timeline & Content Area */
@@ -283,6 +439,7 @@
             flex-direction: column;
             align-items: center;
             gap: 1rem;
+            box-shadow: 0 4px 20px var(--panel-shadow);
         }
 
         .status-message i {
@@ -307,7 +464,7 @@
         .timeline-group {
             position: relative;
             padding-left: 2rem;
-            border-left: 2px solid rgba(255, 255, 255, 0.05);
+            border-left: 2px solid var(--card-border);
         }
 
         .timeline-date-marker {
@@ -319,28 +476,20 @@
             border-radius: 50%;
             background: var(--bg-color);
             border: 3px solid var(--accent-blue);
-            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
             z-index: 1;
+            transition: background-color 0.3s;
         }
 
         .timeline-date-title {
             font-family: 'Outfit', sans-serif;
             font-size: 1.25rem;
             font-weight: 600;
-            color: white;
+            color: var(--text-primary);
             margin-bottom: 1rem;
             display: flex;
             align-items: center;
             gap: 0.75rem;
-        }
-
-        .timeline-date-title span.relative-time {
-            font-size: 0.85rem;
-            font-weight: 400;
-            color: var(--text-secondary);
-            background: rgba(255, 255, 255, 0.05);
-            padding: 0.2rem 0.6rem;
-            border-radius: 9999px;
         }
 
         .cards-list {
@@ -362,6 +511,7 @@
             gap: 0.75rem;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 4px 15px var(--panel-shadow);
         }
 
         .update-card::before {
@@ -377,7 +527,11 @@
         .update-card:hover {
             transform: translateY(-2px);
             border-color: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.15);
+        }
+
+        body.light-mode .update-card:hover {
+            border-color: rgba(0, 0, 0, 0.15);
         }
 
         .card-header {
@@ -408,22 +562,31 @@
 
         .card-btn {
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
             color: var(--text-secondary);
-            width: 32px;
-            height: 32px;
+            padding: 0.4rem 0.8rem;
             border-radius: 8px;
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 0.4rem;
             cursor: pointer;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            font-family: inherit;
             transition: all 0.2s;
+        }
+
+        body.light-mode .card-btn {
+            background: rgba(0, 0, 0, 0.03);
         }
 
         .card-btn:hover {
             background: rgba(255, 255, 255, 0.15);
-            color: white;
+            color: var(--text-primary);
+        }
+
+        body.light-mode .card-btn:hover {
+            background: rgba(0, 0, 0, 0.08);
         }
 
         .card-btn.tweet-btn:hover {
@@ -436,7 +599,7 @@
         .card-body {
             font-size: 0.925rem;
             line-height: 1.6;
-            color: #d1d5db;
+            color: var(--text-primary);
         }
 
         .card-body p {
@@ -448,14 +611,14 @@
         }
 
         .card-body a {
-            color: #60a5fa;
+            color: var(--accent-blue);
             text-decoration: none;
-            border-bottom: 1px dashed rgba(96, 165, 250, 0.4);
+            border-bottom: 1px dashed rgba(59, 130, 246, 0.4);
             transition: all 0.2s;
         }
 
         .card-body a:hover {
-            color: #93c5fd;
+            color: var(--accent-blue-hover);
             border-bottom-style: solid;
         }
 
@@ -470,11 +633,16 @@
 
         .card-body code {
             font-family: 'Courier New', Courier, monospace;
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.2);
             padding: 0.1rem 0.3rem;
             border-radius: 4px;
-            color: #f472b6;
+            color: #ec4899;
             font-size: 0.85em;
+        }
+
+        body.light-mode .card-body code {
+            background: rgba(0, 0, 0, 0.05);
+            color: #db2777;
         }
 
         /* Tweet Modal */
@@ -513,6 +681,10 @@
             position: relative;
         }
 
+        body.light-mode .modal-container {
+            background: #ffffff;
+        }
+
         .modal-overlay.active .modal-container {
             transform: scale(1);
         }
@@ -547,7 +719,7 @@
         }
 
         .modal-close:hover {
-            color: white;
+            color: var(--text-primary);
         }
 
         .modal-body {
@@ -564,12 +736,16 @@
             padding: 0.75rem;
         }
 
+        body.light-mode .tweet-composer {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
         .tweet-composer textarea {
             width: 100%;
             height: 140px;
             background: transparent;
             border: none;
-            color: white;
+            color: var(--text-primary);
             font-family: inherit;
             font-size: 0.95rem;
             resize: none;
@@ -614,7 +790,7 @@
         .btn-secondary {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--card-border);
-            color: white;
+            color: var(--text-primary);
             padding: 0.6rem 1.2rem;
             border-radius: 8px;
             font-family: inherit;
@@ -623,8 +799,16 @@
             transition: background 0.2s;
         }
 
+        body.light-mode .btn-secondary {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
         .btn-secondary:hover {
             background: rgba(255, 255, 255, 0.10);
+        }
+
+        body.light-mode .btn-secondary:hover {
+            background: rgba(0, 0, 0, 0.08);
         }
 
         .btn-primary {
@@ -673,6 +857,12 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        body.light-mode .toast {
+            background: #ffffff;
+            color: #1f2937;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
         .toast.active {
             transform: translateY(0);
             opacity: 1;
@@ -711,6 +901,16 @@
                 </div>
             </div>
             <div class="actions-section">
+                <!-- Theme Toggle Switch -->
+                <div class="theme-switch-container">
+                    <i class="fa-solid fa-moon active" id="moonIcon"></i>
+                    <label class="switch">
+                        <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
+                        <span class="slider"></span>
+                    </label>
+                    <i class="fa-solid fa-sun" id="sunIcon"></i>
+                </div>
+
                 <button class="refresh-btn" id="refreshBtn" onclick="fetchReleaseNotes()">
                     <i class="fa-solid fa-rotate-right" id="refreshIcon"></i>
                     <span>Refresh</span>
@@ -754,6 +954,13 @@
                         <span class="filter-count" id="count-fixed">0</span>
                     </button>
                 </div>
+            </div>
+
+            <div class="control-group">
+                <h3>Actions</h3>
+                <button class="export-btn" onclick="exportToCSV()" title="Export filtered entries to CSV file">
+                    <i class="fa-solid fa-file-csv"></i> Export to CSV
+                </button>
             </div>
         </aside>
 
@@ -811,8 +1018,40 @@
 
         // Fetch release notes on page load
         document.addEventListener('DOMContentLoaded', () => {
+            // Check saved theme preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+                document.getElementById('themeToggle').checked = true;
+                updateThemeIcons(true);
+            }
             fetchReleaseNotes();
         });
+
+        // Theme toggling functionality
+        function toggleTheme() {
+            const isLight = document.getElementById('themeToggle').checked;
+            if (isLight) {
+                document.body.classList.add('light-mode');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.body.classList.remove('light-mode');
+                localStorage.setItem('theme', 'dark');
+            }
+            updateThemeIcons(isLight);
+        }
+
+        function updateThemeIcons(isLight) {
+            const moonIcon = document.getElementById('moonIcon');
+            const sunIcon = document.getElementById('sunIcon');
+            if (isLight) {
+                moonIcon.classList.remove('active');
+                sunIcon.classList.add('active');
+            } else {
+                moonIcon.classList.add('active');
+                sunIcon.classList.remove('active');
+            }
+        }
 
         async function fetchReleaseNotes() {
             const refreshIcon = document.getElementById('refreshIcon');
@@ -969,9 +1208,50 @@
             }
         }
 
+        // Get currently filtered list of items
+        function getFilteredItems() {
+            const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+            const filtered = [];
+
+            allEntries.forEach(entry => {
+                const matchedItems = entry.items.filter(item => {
+                    // Category Filter
+                    const type = item.type.toLowerCase();
+                    let categoryMatch = false;
+                    if (currentFilter === 'all') categoryMatch = true;
+                    else if (currentFilter === 'feature' && type.includes('feature')) categoryMatch = true;
+                    else if (currentFilter === 'changed' && type.includes('change')) categoryMatch = true;
+                    else if (currentFilter === 'deprecated' && type.includes('deprecat')) categoryMatch = true;
+                    else if (currentFilter === 'fixed' && (type.includes('fix') || type.includes('security'))) categoryMatch = true;
+
+                    if (!categoryMatch) return false;
+
+                    // Text Search Match
+                    if (searchVal) {
+                        const contentMatch = item.rawText.toLowerCase().includes(searchVal);
+                        const typeMatch = item.type.toLowerCase().includes(searchVal);
+                        const dateMatch = entry.title.toLowerCase().includes(searchVal);
+                        return contentMatch || typeMatch || dateMatch;
+                    }
+
+                    return true;
+                });
+
+                if (matchedItems.length > 0) {
+                    filtered.push({
+                        date: entry.title,
+                        link: entry.link,
+                        items: matchedItems
+                    });
+                }
+            });
+
+            return filtered;
+        }
+
         function renderTimeline() {
             const contentArea = document.getElementById('contentArea');
-            const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+            const filtered = getFilteredItems();
 
             if (allEntries.length === 0) {
                 contentArea.innerHTML = `
@@ -986,80 +1266,49 @@
             let html = '';
             let totalRendered = 0;
 
-            allEntries.forEach(entry => {
-                // Filter items inside the entry
-                const filteredItems = entry.items.filter(item => {
-                    // 1. Filter by category
-                    const type = item.type.toLowerCase();
-                    let categoryMatch = false;
-                    if (currentFilter === 'all') categoryMatch = true;
-                    else if (currentFilter === 'feature' && type.includes('feature')) categoryMatch = true;
-                    else if (currentFilter === 'changed' && type.includes('change')) categoryMatch = true;
-                    else if (currentFilter === 'deprecated' && type.includes('deprecat')) categoryMatch = true;
-                    else if (currentFilter === 'fixed' && (type.includes('fix') || type.includes('security'))) categoryMatch = true;
+            filtered.forEach(group => {
+                totalRendered += group.items.length;
+                
+                html += `
+                    <div class="timeline-group">
+                        <div class="timeline-date-marker"></div>
+                        <div class="timeline-date-title">
+                            ${group.date}
+                        </div>
+                        <div class="cards-list">
+                `;
 
-                    if (!categoryMatch) return false;
-
-                    // 2. Search match
-                    if (searchVal) {
-                        const contentMatch = item.rawText.toLowerCase().includes(searchVal);
-                        const typeMatch = item.type.toLowerCase().includes(searchVal);
-                        const dateMatch = entry.title.toLowerCase().includes(searchVal);
-                        return contentMatch || typeMatch || dateMatch;
-                    }
-
-                    return true;
-                });
-
-                if (filteredItems.length > 0) {
-                    totalRendered += filteredItems.length;
-
-                    // Parse date for clean representation
-                    const dateStr = entry.title;
+                group.items.forEach(item => {
+                    const cardConfig = getCardConfig(item.type);
+                    const cleanDesc = item.rawText.replace(/\s+/g, ' ').trim();
                     
                     html += `
-                        <div class="timeline-group">
-                            <div class="timeline-date-marker"></div>
-                            <div class="timeline-date-title">
-                                ${dateStr}
-                            </div>
-                            <div class="cards-list">
-                    `;
-
-                    filteredItems.forEach(item => {
-                        const cardConfig = getCardConfig(item.type);
-                        
-                        // Prepare tweet description block
-                        const cleanDesc = item.rawText.replace(/\s+/g, ' ').trim();
-                        
-                        html += `
-                            <div class="update-card" style="--type-color: ${cardConfig.color}; --type-bg-color: ${cardConfig.bgColor};">
-                                <div class="card-header">
-                                    <div class="type-badge">
-                                        <i class="${cardConfig.icon}"></i>
-                                        <span>${item.type}</span>
-                                    </div>
-                                    <div class="card-actions">
-                                        <button class="card-btn" onclick="copyToClipboard('${escapeHtml(cleanDesc)}')" title="Copy content text">
-                                            <i class="fa-solid fa-copy"></i>
-                                        </button>
-                                        <button class="card-btn tweet-btn" onclick="openTweetComposer('${escapeHtml(entry.title)}', '${escapeHtml(item.type)}', '${escapeHtml(cleanDesc)}', '${escapeHtml(entry.link)}')" title="Tweet this update">
-                                            <i class="fa-brands fa-x-twitter"></i>
-                                        </button>
-                                    </div>
+                        <div class="update-card" style="--type-color: ${cardConfig.color}; --type-bg-color: ${cardConfig.bgColor};">
+                            <div class="card-header">
+                                <div class="type-badge">
+                                    <i class="${cardConfig.icon}"></i>
+                                    <span>${item.type}</span>
                                 </div>
-                                <div class="card-body">
-                                    ${item.contentHtml}
+                                <div class="card-actions">
+                                    <button class="card-btn" onclick="copyToClipboard('${escapeHtml(cleanDesc)}')" title="Copy release note text">
+                                        <i class="fa-solid fa-copy"></i> Copy Text
+                                    </button>
+                                    <button class="card-btn tweet-btn" onclick="openTweetComposer('${escapeHtml(group.date)}', '${escapeHtml(item.type)}', '${escapeHtml(cleanDesc)}', '${escapeHtml(group.link)}')" title="Tweet this update">
+                                        <i class="fa-brands fa-x-twitter"></i> Tweet
+                                    </button>
                                 </div>
                             </div>
-                        `;
-                    });
-
-                    html += `
+                            <div class="card-body">
+                                ${item.contentHtml}
                             </div>
                         </div>
                     `;
-                }
+                });
+
+                html += `
+                        </div>
+                    </div>
+                `;
             });
 
             if (totalRendered === 0) {
@@ -1114,6 +1363,37 @@
             }, 3000);
         }
 
+        // Export active/filtered list to CSV format
+        function exportToCSV() {
+            const filtered = getFilteredItems();
+            if (filtered.length === 0) {
+                showToast("No data to export!");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            
+            // Header Row
+            csvContent += '"Date","Type","Link","Content"\r\n';
+
+            filtered.forEach(group => {
+                group.items.forEach(item => {
+                    const cleanText = item.rawText.replace(/"/g, '""').replace(/\s+/g, ' ').trim();
+                    const row = `"${group.date}","${item.type}","${group.link}","${cleanText}"`;
+                    csvContent += row + "\r\n";
+                });
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `bigquery_release_notes_${currentFilter}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("CSV Download started!");
+        }
+
         /* Tweet Composer Logics */
         let activeTweetText = "";
 
@@ -1122,7 +1402,6 @@
             const textarea = document.getElementById('tweetTextarea');
             
             // Format standard template
-            // e.g. "Google Cloud BigQuery Update [June 23, 2026] - Feature: You can now configure..."
             let header = `BigQuery ${type} (${date}): `;
             let hashtags = `\n\n#BigQuery #GoogleCloud`;
             
